@@ -46,6 +46,13 @@ abstract class Node extends Model {
   protected $depthColumn = 'depth';
 
   /**
+   * Column name for parents field.
+   *
+   * @var string
+   */
+  protected $allParentsColumn = 'parents_ids';
+
+  /**
    * Column to perform the default sorting
    *
    * @var string
@@ -57,7 +64,7 @@ abstract class Node extends Model {
   *
   * @var array
   */
-  protected $guarded = array('id', 'parent_id', 'lft', 'rgt', 'depth');
+  protected $guarded = array('id', 'parent_id', 'lft', 'rgt', 'depth','parents_id');
 
   /**
    * Indicates whether we should move to a new parent.
@@ -137,6 +144,34 @@ abstract class Node extends Model {
       });
     }
   }
+
+  /**
+  * Get the parents column name.
+  *
+  * @return string
+  */
+  public function getAllParentsColumnName() {
+    return $this->allParentsColumn;
+  }
+
+  /**
+   * Get the value of the models "parents_ids" field.
+   *
+   * @return int
+   */
+  public function getAllParentsIds() {
+      return $this->getAttribute($this->getAllParentsColumnName());
+  }
+
+  /**
+   * Get the table qualified parent column name.
+   *
+   * @return string
+   */
+  public function getQualifiedParentsColumnName() {
+      return $this->getTable(). '.' .$this->getAllParentsColumnName();
+  }
+
 
   /**
   * Get the parent column name.

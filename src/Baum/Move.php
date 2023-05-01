@@ -1,6 +1,8 @@
 <?php
 namespace Baum;
 
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
+use Illuminate\Database\Eloquent\Casts\Json;
 use \Illuminate\Events\Dispatcher;
 
 /**
@@ -134,12 +136,15 @@ class Move {
 
     $currentId      = $this->quoteIdentifier($this->node->getKey());
     $parentId       = $this->quoteIdentifier($this->parentId());
+    $parentsIds      = $this->quoteIdentifier($this->parentsIds());
     $leftColumn     = $this->node->getLeftColumnName();
     $rightColumn    = $this->node->getRightColumnName();
     $parentColumn   = $this->node->getParentColumnName();
+    $parentsColumn   = $this->node->getAllParentsColumnName();
     $wrappedLeft    = $grammar->wrap($leftColumn);
     $wrappedRight   = $grammar->wrap($rightColumn);
     $wrappedParent  = $grammar->wrap($parentColumn);
+    $wrappedParents  = $grammar->wrap($parentsColumn);
     $wrappedId      = $grammar->wrap($this->node->getKeyName());
 
     $lftSql = "CASE
@@ -156,10 +161,15 @@ class Move {
       WHEN $wrappedId = $currentId THEN $parentId
       ELSE $wrappedParent END";
 
+    $parentsSql = "CASE
+      WHEN $wrappedId = $currentId THEN $parentsIds
+      ELSE $wrappedParents END";
+
     $updateConditions = array(
       $leftColumn   => $connection->raw($lftSql),
       $rightColumn  => $connection->raw($rgtSql),
-      $parentColumn => $connection->raw($parentSql)
+      $parentColumn => $connection->raw($parentSql),
+      $parentsColumn => $connection->raw($parentsSql)
     );
 
     if ( $this->node->timestamps )
@@ -300,6 +310,23 @@ class Move {
         return $this->target->getParentId();
     }
   }
+/**
+ * Computes the new parents ids for the node being moved.
+ *
+ * @return int
+ */
+protected function parentsIds() {
+  switch( $this->position ) {
+    case 'root':
+      return NULL;
+
+    case 'child':
+        return Json::encode($this->target->getAllParentsIds()[]=$this->target->getKey());
+
+    default:
+      return Json::encode($this->target->getAllParentsIds());
+  }
+}
 
   /**
    * Check wether there should be changes in the downward tree structure.

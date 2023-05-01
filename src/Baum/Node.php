@@ -3,6 +3,7 @@ namespace Baum;
 
 use Baum\Extensions\Eloquent\Collection;
 use Baum\Extensions\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 
 /**
  * Node
@@ -16,8 +17,14 @@ use Baum\Extensions\Eloquent\Model;
  * commercial categories, etc.) or an efficient way of querying big trees.
  */
 abstract class Node extends Model {
+    public function __construct(array $attributes = [])
+    {
+        $this->casts[$this->allParentsColumn] = AsArrayObject::class;
+        parent::__construct($attributes);
+    }
 
-  /**
+
+    /**
    * Column name to store the reference to parent's node.
    *
    * @var string

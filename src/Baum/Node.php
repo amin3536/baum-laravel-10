@@ -152,6 +152,16 @@ abstract class Node extends Model {
     }
   }
 
+
+  /**
+   * Get the value of the model's column use in path generator , default value is primary key  . [1,3,9]
+   *
+   * @return mixed
+   */
+  public function getColumnPathGenerator()
+  {
+      return $this->getAttribute($this->getKeyName());
+  }
   /**
   * Get the parents column name.
   *
@@ -178,6 +188,7 @@ abstract class Node extends Model {
   public function getQualifiedParentsColumnName() {
       return $this->getTable(). '.' .$this->getAllParentsColumnName();
   }
+
 
 
   /**

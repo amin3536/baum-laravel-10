@@ -169,7 +169,7 @@ class Move {
       $leftColumn   => $connection->raw($lftSql),
       $rightColumn  => $connection->raw($rgtSql),
       $parentColumn => $connection->raw($parentSql),
-      $parentsColumn => $connection->raw($parentsSql)
+      $parentsColumn => $this->parentsIds()
     );
 
     if ( $this->node->timestamps )
@@ -310,23 +310,23 @@ class Move {
         return $this->target->getParentId();
     }
   }
-/**
- * Computes the new parents ids for the node being moved.
- *
- * @return int
- */
-protected function parentsIds() {
-  switch( $this->position ) {
-    case 'root':
-      return NULL;
+    /**
+     * Computes the new parents ids for the node being moved.
+     *
+     * @return int
+     */
+    protected function parentsIds() {
+      switch( $this->position ) {
+        case 'root':
+          return NULL;
 
-    case 'child':
-        return Json::encode($this->target->getAllParentsIds()[]=$this->target->getKey());
+        case 'child':
+            return Json::encode($this->target->getAllParentsIds()[]=$this->target->getColumnPathGenerator());
 
-    default:
-      return Json::encode($this->target->getAllParentsIds());
-  }
-}
+        default:
+          return Json::encode($this->target->getAllParentsIds());
+      }
+    }
 
   /**
    * Check wether there should be changes in the downward tree structure.

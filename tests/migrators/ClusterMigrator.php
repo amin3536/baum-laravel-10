@@ -11,6 +11,7 @@ class ClusterMigrator {
       $t->string('id');
 
       $t->string('parent_id')->nullable();
+      $t->string('parents_ids')->nullable();
       $t->integer('lft')->nullable();
       $t->integer('rgt')->nullable();
       $t->integer('depth')->nullable();

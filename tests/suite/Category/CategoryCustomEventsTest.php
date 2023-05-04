@@ -4,7 +4,7 @@ use Mockery as m;
 
 class CategoryCustomEventsTest extends CategoryTestCase {
 
-  public function tearDown() {
+  public function tearDown():void {
     m::close();
   }
 

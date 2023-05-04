@@ -164,19 +164,18 @@ class Move {
       $leftColumn   => $connection->raw($lftSql),
       $rightColumn  => $connection->raw($rgtSql),
       $parentColumn => $connection->raw($parentSql),
-      $parentsColumn => $this->parentsIds()
     );
 
     if ( $this->node->timestamps )
       $updateConditions[$this->node->getUpdatedAtColumn()] = $this->node->freshTimestamp();
 
-    return $this->node
-                ->newNestedSetQuery()
+    $this->node->newNestedSetQuery()
                 ->where(function($query) use ($leftColumn, $rightColumn, $a, $d) {
                   $query->whereBetween($leftColumn, array($a, $d))
                         ->orWhereBetween($rightColumn, array($a, $d));
                 })
                 ->update($updateConditions);
+    return $this->node->update([$parentsColumn => $this->parentsIds()]);
   }
 
   /**
@@ -324,10 +323,10 @@ class Move {
                 }else{
                     $parents= [$this->target->getColumnPathGenerator()];
                 }
-                return json_encode($parents);
+                return $parents;
 
             default:
-                return Json::encode($this->target->getAllParentsIds());
+                return $this->target->getAllParentsIds();
         }
     }
 

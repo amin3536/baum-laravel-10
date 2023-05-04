@@ -136,7 +136,6 @@ class Move {
 
     $currentId      = $this->quoteIdentifier($this->node->getKey());
     $parentId       = $this->quoteIdentifier($this->parentId());
-    $parentsIds      = $this->quoteIdentifier($this->parentsIds());
     $leftColumn     = $this->node->getLeftColumnName();
     $rightColumn    = $this->node->getRightColumnName();
     $parentColumn   = $this->node->getParentColumnName();
@@ -144,7 +143,6 @@ class Move {
     $wrappedLeft    = $grammar->wrap($leftColumn);
     $wrappedRight   = $grammar->wrap($rightColumn);
     $wrappedParent  = $grammar->wrap($parentColumn);
-    $wrappedParents  = $grammar->wrap($parentsColumn);
     $wrappedId      = $grammar->wrap($this->node->getKeyName());
 
     $lftSql = "CASE
@@ -161,9 +159,6 @@ class Move {
       WHEN $wrappedId = $currentId THEN $parentId
       ELSE $wrappedParent END";
 
-    $parentsSql = "CASE
-      WHEN $wrappedId = $currentId THEN $parentsIds
-      ELSE $wrappedParents END";
 
     $updateConditions = array(
       $leftColumn   => $connection->raw($lftSql),
@@ -316,16 +311,24 @@ class Move {
      * @return int
      */
     protected function parentsIds() {
-      switch( $this->position ) {
-        case 'root':
-          return NULL;
+        switch( $this->position ) {
+            case 'root':
+                return NULL;
 
-        case 'child':
-            return Json::encode($this->target->getAllParentsIds()[]=$this->target->getColumnPathGenerator());
+            case 'child':
+                $parents=$this->target->getAllParentsIds();
+                if(!is_array($parents)&&!is_null($parents)) {
+                    $parents = array($parents, $this->target->getColumnPathGenerator());
+                }elseif(is_array($parents)) {
+                    $parents[] = $this->target->getColumnPathGenerator();
+                }else{
+                    $parents= [$this->target->getColumnPathGenerator()];
+                }
+                return json_encode($parents);
 
-        default:
-          return Json::encode($this->target->getAllParentsIds());
-      }
+            default:
+                return Json::encode($this->target->getAllParentsIds());
+        }
     }
 
   /**

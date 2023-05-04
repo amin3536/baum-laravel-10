@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 abstract class Node extends Model {
     public function __construct(array $attributes = [])
     {
-        $this->casts[$this->allParentsColumn] = AsArrayObject::class;
+        $this->casts[$this->allParentsColumn] = 'array';
         parent::__construct($attributes);
     }
 

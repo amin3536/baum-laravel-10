@@ -159,23 +159,24 @@ class Move {
       WHEN $wrappedId = $currentId THEN $parentId
       ELSE $wrappedParent END";
 
-
     $updateConditions = array(
       $leftColumn   => $connection->raw($lftSql),
       $rightColumn  => $connection->raw($rgtSql),
       $parentColumn => $connection->raw($parentSql),
+        $parentsColumn => $this->parentsIds()
     );
 
     if ( $this->node->timestamps )
       $updateConditions[$this->node->getUpdatedAtColumn()] = $this->node->freshTimestamp();
 
-    $this->node->newNestedSetQuery()
+//    $this->node->update([$parentsColumn => $this->parentsIds()]);
+    return $this->node
+                ->newNestedSetQuery()
                 ->where(function($query) use ($leftColumn, $rightColumn, $a, $d) {
                   $query->whereBetween($leftColumn, array($a, $d))
                         ->orWhereBetween($rightColumn, array($a, $d));
                 })
                 ->update($updateConditions);
-    return $this->node->update([$parentsColumn => $this->parentsIds()]);
   }
 
   /**
